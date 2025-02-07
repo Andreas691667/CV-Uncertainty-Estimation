@@ -1,0 +1,3 @@
+[submodule "bayesian-yolov3"]
+	path = bayesian-yolov3
+	url = https://github.com/flkraus/bayesian-yolov3.git
