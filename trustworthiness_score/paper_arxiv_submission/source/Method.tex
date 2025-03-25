@@ -1,0 +1,48 @@
+\begin{figure*}%[h]
+\centering 
+% \resizebox{!}{115}{
+    \begin{tikzpicture}[node distance=3.5cm]
+   
+    \node (classifier) [process, minimum width=1.5cm, minimum height=1.5cm, text width=1.5cm, text height=0cm, text depth = 0 cm, yshift=0cm, xshift=0cm] {Main Classifier};
+
+    % \node[text width=3cm] at ([xshift=0mm,yshift=-7mm]classifier.east) 
+    % {\tiny $MC \geq MC_{T}$};
+
+    % \node[text width=3cm] at ([xshift=0mm,yshift=5mm]classifier.east) 
+    % {\tiny $MC < MC_{T}$};
+
+    \node (ss_calculation) [process, right of=classifier, minimum width=2cm, minimum height=1cm, text width=2.5cm, text height=0cm, text depth = 0 cm, yshift=0.5cm, xshift=1.2cm] {SS Calculation};
+    
+    
+    \node (explanations_generator) [process,  right of=classifier, minimum width=1.5cm, minimum height=1.5cm, text width=2.5cm, text height=0cm, text depth = 0 cm, yshift=-1cm, xshift=1.2cm, align=center] {Explanations Generator};
+    
+    \node (features) [process,  below of=classifier, minimum width=1.5cm, minimum height=1.5cm, text width=2cm, text height=0cm, text depth = 0.5 cm, yshift=0.5cm, xshift=0cm, align=center] {Features Specifications Monitor};
+    
+    \node (tcs_calculation) [process,  below of=explanations_generator, minimum width=2cm, minimum height=1cm, text width=2.5cm, text height=0cm, text depth = 0 cm, yshift=1.5cm, xshift=0cm, align=center] {TS Calculation};
+    
+     
+      \draw[arrow] (-1.1,-1.5) -| node[anchor=south east] {Image ${i}$} (classifier);
+      
+    %   \draw (-1,0) -| node[anchor=south] {} (-1,-2.5);
+      
+    %   \draw[arrow] (-1,-2.5) -- node[anchor=south] {} (features);
+    
+    \draw[arrow] (-1.1,-1.5) -| node[anchor=south] {} (features);
+      
+      \draw[arrow] ([yshift=-5mm]classifier.east) -- node[anchor=south] {$\{N_{i,1},..., N_{i,Y_i}\}$} ([yshift=5mm]explanations_generator.west);
+
+      \draw[arrow] ([yshift=5mm]classifier.east) -- node[anchor=south] {$\{M_{i,1},..., M_{i,J_i}\}$} ([yshift=0mm]ss_calculation.west);
+      
+      \draw[arrow] (explanations_generator) -- node[anchor=west] {$\{E_{i,1},..., E_{i,Y_i}\}$} (tcs_calculation);
+      
+      \draw[arrow] (features) -- node[anchor=south] {$\{F_{i,1},..., F_{i,Z_i}\}$} (tcs_calculation);
+      
+      \draw[arrow] (tcs_calculation) -- node[anchor=south] {$\{TS_{i,1},..., TS_{i,Y_i}\}$} (9,-3);
+
+      \draw[arrow] (ss_calculation) -- node[anchor=south] {$SS_{i}$} (7.5,0.5);
+       
+    \end{tikzpicture}
+    % }
+\caption{Method Overview}
+\label{fig:method_overview}
+\end{figure*}

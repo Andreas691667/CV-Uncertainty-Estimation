@@ -1,0 +1,20 @@
+Due to the black box nature of Convolutional Neural Networks (CNNs), the continuous validation of CNNs during operation is challenging with the absence of a human monitor. 
+%
+As a result this makes it difficult for developers and regulators to gain confidence in the deployment of autonomous systems employing CNNs.
+%
+It is critical for safety during operation to know when CNN's predictions are trustworthy or suspicious.  
+%
+With the absence of a human monitor, the basic approach is to use the model's output confidence score to assess if predictions are trustworthy or suspicious.  
+%
+However, the model's confidence score is a result of computations coming from a black box, therefore lacks transparency and makes it challenging to automatedly credit trustworthiness to predictions.
+%
+We introduce the \textit{trustworthiness score} (TS), a simple metric that provides a more transparent and effective way of providing confidence in CNNs predictions compared to model's confidence score. 
+%
+The metric quantifies the trustworthiness in a prediction by checking for the existence of certain features in the predictions made by the CNN. 
+%
+We also use the underlying idea of the TS metric, to provide a \textit{suspiciousness score} (SS) in the overall input frame to help in the detection of suspicious frames where false negatives exist.
+% which provides for suspiciousness in a frame  by scanning for the existence of untrustworthy predictions.
+%
+We conduct a case study using YOLOv5 on persons detection to demonstrate our method and usage of TS and SS. 
+%
+The case study shows that using our method consistently improves the precision of predictions compared to relying on model confidence score alone, for both 1) approving of trustworthy predictions ($\sim 20\%$ improvement) and 2) detecting suspicious frames ($\sim 5\%$ improvement). 
