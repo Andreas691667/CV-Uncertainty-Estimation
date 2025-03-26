@@ -40,4 +40,5 @@ If you find this work useful in your research, please consider citing:
   - example script to create tfrecordsfile is provided (create_tf_records_citypersons.py)
 - Pretrained yolov3 weights:
   - you need to download the "darknet53.conv.74" from the original yolov3 site (pjreddie).
+  - wget https://pjreddie.com/media/files/darknet53.conv.74
 - Most things you can change should be marked with an "edit" comment.
