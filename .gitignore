@@ -1,3 +1,8 @@
+# dataset
+ECP/
+*.zip
+darknet53.conv.74
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
