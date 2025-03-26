@@ -114,6 +114,7 @@ def main():
     start = time.time()
 
     all_jobs = []
+    # NOTE: Add 'train' to list
     for split in ['val']:
         all_jobs.extend(create_jobs(split))
 
