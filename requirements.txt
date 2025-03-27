@@ -4,4 +4,4 @@ matplotlib
 scipy
 opencv-python
 pillow
-
+tqdm
