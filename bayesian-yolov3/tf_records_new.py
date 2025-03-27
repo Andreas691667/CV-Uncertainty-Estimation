@@ -7,8 +7,14 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 # Define paths
-BASE_DIR = os.getcwd() + '/ECP/day'
-TFRECORD_DIR = os.getcwd() + '/data/ecp/tfrecords'
+# # BASE_DIR = os.getcwd() + '/ECP/day'
+# BASE_DIR = os.path.expandvars('$HOME') + '/ecp/ECP/day'
+# # TFRECORD_DIR = os.getcwd() + '/data/ecp/tfrecords'
+# TFRECORD_DIR = os.path.expandvars('$HOME') + '/ecp/tfrecords'
+
+BASE_DIR = os.path.expandvars('$HOME/ecp/ECP/day')
+TFRECORD_DIR = os.path.expandvars('$HOME/data/ecp/tfrecords')
+
 os.makedirs(TFRECORD_DIR, exist_ok=True)
 
 # Define shard details
@@ -115,7 +121,7 @@ def main():
 
     all_jobs = []
     # NOTE: Add 'train' to list
-    for split in ['val']:
+    for split in ['val', 'train']:
         all_jobs.extend(create_jobs(split))
 
     with ThreadPoolExecutor() as executor:
