@@ -24,7 +24,7 @@ def main():
         'darknet53_weights': os.getcwd() + '/bayesian-yolov3/darknet53.conv.74', # edit
         'batch_size': 8,  # edit
         'lr': 1e-5,
-        'cpu_thread_cnt': 24,  # edit
+        'cpu_thread_cnt': 1,  # edit
         'crop': True,  # edit: random crops and rescaling reduces memory consumption and improves training
         'freeze_darknet53': True,  # if True the basenet weights are frozen during training
         'aleatoric_loss': False,
@@ -33,7 +33,7 @@ def main():
         'train': {
             # 'file_pattern': os.getcwd() + '/data/ecp/tfrecords/ecp-day-¨-*-of-*',  # edit
             'file_pattern': os.path.expandvars('$HOME') + '/data/ecp/tfrecords/ecp-day-train-*-of-*',  # edit
-            'num_shards': 1,
+            'num_shards': 3,
             'shuffle_buffer_size': 2000,
             'cache': False,  # edit if you have enough memory, caches whole dataset in memory
         },
