@@ -229,8 +229,8 @@ def main():
         'dataset_name': 'ecp',
         'img_dir': './ecp/ECP/day/img',
         'label_dir': './ecp/ECP/day/labels',
-        'train_shards': 3,
-        'val_shards': 1,
+        'train_shards': 20,
+        'val_shards': 4,
     }
 
     logging.info('Saving results to {}'.format(config['out_dir']))
@@ -255,29 +255,32 @@ if __name__ == '__main__':
     main()
     
     # verify the tfrecord files
-    path = './data/ecp/tfrecords/ecp-train-00001-of-00003'
+    path = './data/ecp/tfrecords/ecp-train-00003-of-000020'
     raw_dataset = tf.data.TFRecordDataset(path)
     
     iterator = raw_dataset.make_one_shot_iterator()
     next_element = iterator.get_next()
 
     with tf.Session() as sess:
-        for _ in range(100):
+        for _ in range(5):
             raw_record = sess.run(next_element)
             example = tf.train.Example()
+            example.ParseFromString(raw_record)
 
             img = example
-            print((img.features.feature))
-            # print('image/height:', img.features.feature['image/height'])
-            # print('image/width:', img.features.feature['image/width'])
-            # print('image/filename:', img.features.feature['image/filename'])
-            # print('image/source_id:', img.features.feature['image/source_id'])
-            # print('image/encoded:', img.features.feature['image/encoded'])
-            # print('image/format:', img.features.feature['image/format'])
-            # print('image/object/bbox/xmin:', img.features.feature['image/object/bbox/xmin'])
-            # print('image/object/bbox/xmax:', img.features.feature['image/object/bbox/xmax'])
-            # print('image/object/bbox/ymin:', img.features.feature['image/object/bbox/ymin'])
-            # print('image/object/bbox/ymax:', img.features.feature['image/object/bbox/ymax'])
-            # print('image/object/class/text:', img.features.feature['image/object/class/text'])
-            # print('image/object/class/label:', img.features.feature['image/object/class/label'])
-            # print('image/object/instance/id:', img.features.feature['image/object/instance/id'])
+            # print((img.features.feature))
+            print('image/height:', img.features.feature['image/height'].int64_list.value[0])
+            print('image/width:', img.features.feature['image/width'].int64_list.value[0])
+            print('image/filename:', img.features.feature['image/filename'].bytes_list.value[0].decode('utf-8'))
+            print('image/source_id:', img.features.feature['image/source_id'].bytes_list.value[0].decode('utf-8'))
+            print('image/encoded: [binary data]')
+            print('image/format:', img.features.feature['image/format'].bytes_list.value[0].decode('utf-8'))
+            print('image/object/bbox/xmin:', img.features.feature['image/object/bbox/xmin'].float_list.value)
+            print('image/object/bbox/xmax:', img.features.feature['image/object/bbox/xmax'].float_list.value)
+            print('image/object/bbox/ymin:', img.features.feature['image/object/bbox/ymin'].float_list.value)
+            print('image/object/bbox/ymax:', img.features.feature['image/object/bbox/ymax'].float_list.value)
+            print('image/object/class/text:', [text.decode('utf-8') for text in img.features.feature['image/object/class/text'].bytes_list.value])
+            print('image/object/class/label:', img.features.feature['image/object/class/label'].int64_list.value)
+            print('image/object/instance/id:', img.features.feature['image/object/instance/id'].int64_list.value)
+            
+            print('\n')

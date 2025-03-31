@@ -32,15 +32,15 @@ def main():
         'implicit_background_class': True,  # whether the label ids start at 1 or 0. True = 1, False = 0
         'train': {
             # 'file_pattern': os.getcwd() + '/data/ecp/tfrecords/ecp-day-¨-*-of-*',  # edit
-            'file_pattern': os.path.expandvars('$HOME') + '/data/ecp/tfrecords/ecp-day-train-*-of-*',  # edit
-            'num_shards': 3,
+            'file_pattern': '../data/ecp/tfrecords/ecp-day-train-*-of-*',  # edit
+            'num_shards': 20,
             'shuffle_buffer_size': 2000,
             'cache': False,  # edit if you have enough memory, caches whole dataset in memory
         },
         'val': {
             # 'file_pattern': os.getcwd() + '/data/ecp/tfrecords/ecp-day-val-*-of-*',  # edit
-            'file_pattern': os.path.expandvars('$HOME') + '/data/ecp/tfrecords/ecp-day-val-*-of-*',  # edit
-            'num_shards': 1,
+            'file_pattern': '../data/ecp/tfrecords/ecp-day-val-*-of-*',  # edit
+            'num_shards': 4,
             'shuffle_buffer_size': 10,
             'cache': False,  # edit if you have enough memory, caches whole dataset in memory
         }
