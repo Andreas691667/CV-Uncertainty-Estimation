@@ -370,6 +370,7 @@ class yolov3_aleatoric:
     def __build_model(self, inputs, training, gt1=None, gt2=None, gt3=None):
         in_shape = inputs.get_shape().as_list()
         assert len(in_shape) == 4, 'invalid data format'
+        print("in_shape:", in_shape)
         # assert in_shape[3] == 3, 'invalid data format'
 
         mb = model.ModelBuilder(inputs=inputs, cls_cnt=self.cls_cnt)

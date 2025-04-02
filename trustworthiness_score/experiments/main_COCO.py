@@ -22,10 +22,10 @@ import pandas as pd
 # =================================================================================
 # == Results setup
 # =================================================================================
-ExperimentID = 14
+ExperimentID = 15
 Face_extraction = True
 Palm_extraction = True
-Legs_extraction = True
+Legs_extraction = False
 results_dir_name = "Results/Experiment" + str(ExperimentID) + "/"
 if not os.path.exists(results_dir_name):
    os.makedirs(results_dir_name)
@@ -196,8 +196,8 @@ def IoU_calculator(left1, top1, right1, bottom1,
 # =================================================================================
 # == Import dataset
 # =================================================================================
-dataset_dir = "../datasets/COCO_legs/images/test/"#"../datasets/INRIAPerson/Test/pos/"#
-dataset_ground_truth_dir = "../datasets/COCO_legs/labels/test/"#"../datasets/INRIAPerson/Test/annotations/"
+dataset_dir = "../datasets/COCO/images/test/"#"../datasets/INRIAPerson/Test/pos/"#
+dataset_ground_truth_dir = "../datasets/COCO/labels/test/"#"../datasets/INRIAPerson/Test/annotations/"
 
 try:
    # Loop over images
@@ -268,10 +268,10 @@ try:
       # =================================================================================
       # == Generate predictions
       # =================================================================================
-      v_boxes, v_labels, v_scores, box_classes_scores = YoloPredict(image, input_w, input_h)
+      v_boxes, v_labels, v_scores, box_classes_scores = YoloPredict(image, input_w, input_h, min_class_threshold=0.3)
       annotated_image = image_cv2.copy()
       # draw boxes
-      do_plot = False
+      do_plot = True
       # array_of_predictions = []
 
       counter = 0

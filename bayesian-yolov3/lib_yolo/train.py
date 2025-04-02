@@ -3,11 +3,15 @@ import json
 import logging
 import os
 
+import sys
+
 import numpy as np
 import tensorflow as tf
+import tqdm
 
 from lib_yolo import dataset_utils, data_augmentation
 
+tf.keras.backend.set_image_data_format('channels_last')
 
 def save_config(config, folder):
     time_string = datetime.datetime.now().isoformat().split('.')[0]
@@ -23,6 +27,7 @@ def save_config(config, folder):
 
 
 def start(model_cls, config):
+
     if config['crop']:
         cropper = data_augmentation.ImageCropper(config)
         config['train']['crop_fn'] = cropper.random_crop_and_sometimes_rescale
@@ -30,17 +35,34 @@ def start(model_cls, config):
 
     model_factory = model_cls(config)
 
-    dataset = dataset_utils.TrainValDataset(model_blueprint=model_factory.blueprint, config=config)
-
+    dataset = dataset_utils.TrainValDataset(model_blueprint=model_factory.blueprint, config=config)        
+    # print("BUILT WITH CUDA: ", tf.test.is_built_with_cuda())
+    
     # currently all models have 3 detection layers, so this works...
     img, gt1, gt2, gt3 = dataset.iterator.get_next()
+    # print('IMG SHAPE:', img.shape)
+    
     model = model_factory.init_model(inputs=img, training=True, gt1=gt1, gt2=gt2, gt3=gt3).get_model()
 
     # also all models are powerd by darknet53...
     assign_ops = model_factory.load_darknet53_weights(config['darknet53_weights'])
 
-    with tf.Session(config=tf.ConfigProto(device_count={'GPU': 1})) as sess:
+    # test if GPU is available
+    if not tf.test.is_gpu_available():
+        raise EnvironmentError("No GPU found! Please check your CUDA/cuDNN installation.")
+    else:
+        print("GPU is available:", tf.test.gpu_device_name())
+    
+    # start seesion
+    conf = tf.ConfigProto()
+    conf.device_count['GPU'] = 1
+    conf.log_device_placement = False
+    # allow soft placement
+    conf.allow_soft_placement = True
+    
+    with tf.Session(config=conf) as sess:
         dataset.init_dataset(sess)
+
         try:
             train(sess, model, dataset, config, init_ops=assign_ops)
         except:
@@ -50,9 +72,13 @@ def start(model_cls, config):
 
 def train(sess, model, dataset, config, init_ops=None):
     def train_loop_body():
+        
+        
         summary, tloss, dloss, rloss, lloss, oloss, closs = sess.run(
             [train_step, summary_op, model.total_loss, model.detection_loss, model.regularization_loss,
              model.loc_loss, model.obj_loss, model.cls_loss], feed_dict={dataset.handle: dataset.train_handle})[1:]
+        
+        
         if np.isnan(tloss) or np.isinf(tloss):
             logging.error('{:5d} >>> total_loss: {:8.2f}, det_loss: {:8.2f}, loc_loss: {:8.2f},'
                           ' obj_loss: {:8.2f}, cls_loss: {:8.2f}, reg_loss: {:8.5f}'.format(
@@ -112,9 +138,11 @@ def train(sess, model, dataset, config, init_ops=None):
                                          sess.graph)
     writer_val = tf.summary.FileWriter(os.path.join(config['tensorboard_path'], config['run_id'], 'val'))
     try:
+        pbar = tqdm.tqdm(total=config['train_steps'], initial=step, unit='step', desc='Training')
         while step < config['train_steps']:
             step += 1
             success = train_loop_body()
+            pbar.update(1)
             if not success:
                 logging.error('An error occurred, abort training.')
                 break
@@ -126,9 +154,10 @@ def train(sess, model, dataset, config, init_ops=None):
             ans = input('Save checkpoint (yes/no): ')
         if ans.lower() in ['no', 'n']:
             return  # without saving checkpoint
-    except:
+    except Exception as e:
         # try to save if an unexpected error occurs
-        logging.error('Unexpected error occured, try to save checkpoint.')
+        print(e)    
+        logging.error('Unexpected error occured, try to save checkpoint')
         saver.save(sess, os.path.join(save_path, config['run_id']), global_step=step)
 
     # save if training ended

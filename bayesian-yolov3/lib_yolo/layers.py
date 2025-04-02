@@ -546,12 +546,15 @@ def conv(inputs, filters, kernel_size, strides, normalizer, trainable, weight_re
     assert kernel_size in [1, 3], 'invalid kernel size'
     assert strides in [1, 2], 'invalid strides'
 
-    use_bias = False
+    use_bias = False    
+    
     inputs = tf.layers.conv2d(inputs, filters, kernel_size, strides=strides, activation=None, padding=padding,
                               use_bias=use_bias,
                               trainable=trainable,
                               kernel_regularizer=weight_regularizer,
-                              bias_regularizer=weight_regularizer if use_bias else None)
+                              bias_regularizer=weight_regularizer if use_bias else None,
+                              data_format='channels_last')  # channels_last
+    
 
     # check for multiple normalizers:
     if isinstance(normalizer, dict):
@@ -572,6 +575,7 @@ def conv(inputs, filters, kernel_size, strides, normalizer, trainable, weight_re
             raise ValueError('Invalid regularizer type: {}'.format(n['type']))
 
     inputs = tf.nn.leaky_relu(inputs, alpha=0.1)
+        
     return inputs
 
 

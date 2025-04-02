@@ -7,7 +7,7 @@ def decode_img(encoded, shape):
     # decode image and scale to [0, 1)
     img = tf.image.decode_png(encoded, dtype=tf.uint8)
     img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # convert to [0, 1)
-    img.set_shape(shape)
+    img.set_shape(shape) # shape is HWC        
     return img
 
 
@@ -99,7 +99,9 @@ def create_dataset(config, dataset_key):
     # in 1.9 list_files can shuffle directly...
     info = config[dataset_key]
     files = tf.data.Dataset.list_files(info['file_pattern']).shuffle(info['num_shards'])
-
+    
+    # files = files.map(lambda x: tf.py_function(func=lambda y: print("Found file:", y.numpy()), inp=[x], Tout=tf.string))
+        
     # cycle_length is important if the whole dataset does not fit into memory
     dataset = files.interleave(tf.data.TFRecordDataset, cycle_length=2, block_length=1)
 
@@ -141,11 +143,22 @@ class TrainValDataset:
         train_dataset = train_dataset.repeat()
         train_dataset = train_dataset.batch(batch_size=config['batch_size'])
 
-        train_dataset = train_dataset.prefetch(buffer_size=1)
 
+        #### ALL ABOVE IS ON CPU ####
+        # https://github.com/tensorflow/tensorflow/issues/13610#issuecomment-411893139
+        #multi_device_iterator = prefetching_ops.MultiDeviceIterator(host_dataset_on_cpu, devices=['/gpu:0', '/gpu:1'])
+        #elem_on_gpu_0, elem_on_gpu_1 = multi_device_iterator.get_next()
+        
+        # self.__train_iterator = tf.data.experimental.prefetch_to_device('/gpu:0', train_dataset)
+        # self.__val_iterator = tf.data.experimental.prefetch_to_device('/gpu:0', val_dataset)
+        # returns A Dataset transformation function, which can be passed to tf.data.Dataset.apply.
+
+        # self.__train_iterator = train_dataset.apply(tf.data.experimental.prefetch_to_device('/device:GPU:0')).make_one_shot_iterator()
+        # self.__val_iterator = val_dataset.apply(tf.data.experimental.prefetch_to_device('/device:GPU:0')).make_one_shot_iterator()
+        
         self.__train_iterator = train_dataset.make_one_shot_iterator()
-        self.__val_iterator = val_dataset.make_one_shot_iterator()
-
+        self.__val_iterator = val_dataset.make_one_shot_iterator()    
+        
         # ---------------- #
         # public interface #
         # ---------------- #
@@ -154,6 +167,7 @@ class TrainValDataset:
                                                             train_dataset.output_shapes)
         self.train_handle = None
         self.val_handle = None
+        
 
     def init_dataset(self, sess):
         self.train_handle = sess.run(self.__train_iterator.string_handle())

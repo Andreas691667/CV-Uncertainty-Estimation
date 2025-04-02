@@ -279,8 +279,8 @@ def main():
         'img_dir': '$HOME/data/cityscapes',
 
         # Number of training and validation shards.
-        'train_shards': 3,  # 75% as training
-        'val_shards': 1,    # 25% as validation
+        'train_shards': 3,  
+        'val_shards': 1,    
 
         # Shuffle the data before writing it to tfrecord files.
         'shuffle': True,
