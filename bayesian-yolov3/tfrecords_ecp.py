@@ -77,6 +77,8 @@ class ExampleCreator:
     def encode_png(self, img):
         assert len(img.shape) == 3
         assert img.shape[2] == 3
+        assert img.shape[1] == 1920
+        assert img.shape[0] == 1024
         return self._sess.run(self._encoded, feed_dict={self._encode_data: img})
 
     def load_img(self, path):
@@ -225,12 +227,12 @@ def process_dataset(out_dir, dataset_name, img_dir, label_dir, train_shards, val
 
 def main():
     config = {
-        'out_dir': './tfrecords',
+        'out_dir': './DATA/tfrecords_20_4',
         'dataset_name': 'ecp',
         'img_dir': './ecp/ECP/day/img',
         'label_dir': './ecp/ECP/day/labels',
-        'train_shards': 100,
-        'val_shards': 8,
+        'train_shards': 20,
+        'val_shards': 4,
     }
 
     logging.info('Saving results to {}'.format(config['out_dir']))
@@ -252,35 +254,40 @@ if __name__ == '__main__':
                         datefmt='%a, %d %b %Y %H:%M:%S',
                         )
 
-    main()
+    # main()
     
-    # # verify the tfrecord files
-    # path = './data/ecp/tfrecords/ecp-train-00003-of-00020'
-    # raw_dataset = tf.data.TFRecordDataset(path)
+    # verify the tfrecord files
+    path = './data/ecp/tfrecords_20_4/ecp-train-00003-of-00020'
+    raw_dataset = tf.data.TFRecordDataset(path)
     
-    # iterator = raw_dataset.make_one_shot_iterator()
-    # next_element = iterator.get_next()
+    iterator = raw_dataset.make_one_shot_iterator()
+    next_element = iterator.get_next()
 
-    # with tf.Session() as sess:
-    #     for _ in range(5):
-    #         raw_record = sess.run(next_element)
-    #         example = tf.train.Example()
-    #         example.ParseFromString(raw_record)
 
-    #         img = example
-    #         # print((img.features.feature))
-    #         print('image/height:', img.features.feature['image/height'].int64_list.value[0])
-    #         print('image/width:', img.features.feature['image/width'].int64_list.value[0])
-    #         print('image/filename:', img.features.feature['image/filename'].bytes_list.value[0].decode('utf-8'))
-    #         print('image/source_id:', img.features.feature['image/source_id'].bytes_list.value[0].decode('utf-8'))
-    #         print('image/encoded: [binary data]')
-    #         print('image/format:', img.features.feature['image/format'].bytes_list.value[0].decode('utf-8'))
-    #         print('image/object/bbox/xmin:', img.features.feature['image/object/bbox/xmin'].float_list.value)
-    #         print('image/object/bbox/xmax:', img.features.feature['image/object/bbox/xmax'].float_list.value)
-    #         print('image/object/bbox/ymin:', img.features.feature['image/object/bbox/ymin'].float_list.value)
-    #         print('image/object/bbox/ymax:', img.features.feature['image/object/bbox/ymax'].float_list.value)
-    #         print('image/object/class/text:', [text.decode('utf-8') for text in img.features.feature['image/object/class/text'].bytes_list.value])
-    #         print('image/object/class/label:', img.features.feature['image/object/class/label'].int64_list.value)
-    #         print('image/object/instance/id:', img.features.feature['image/object/instance/id'].int64_list.value)
+    conf = tf.ConfigProto()
+    conf.device_count['GPU'] = 1
+    conf.log_device_placement = False
+
+    with tf.Session(config=conf) as sess:
+        for _ in range(5):
+            raw_record = sess.run(next_element)
+            example = tf.train.Example()
+            example.ParseFromString(raw_record)
+
+            img = example
+            # print((img.features.feature))
+            print('image/height:', img.features.feature['image/height'].int64_list.value[0])
+            print('image/width:', img.features.feature['image/width'].int64_list.value[0])
+            print('image/filename:', img.features.feature['image/filename'].bytes_list.value[0].decode('utf-8'))
+            print('image/source_id:', img.features.feature['image/source_id'].bytes_list.value[0].decode('utf-8'))
+            print('image/encoded: [binary data]')
+            print('image/format:', img.features.feature['image/format'].bytes_list.value[0].decode('utf-8'))
+            print('image/object/bbox/xmin:', img.features.feature['image/object/bbox/xmin'].float_list.value)
+            print('image/object/bbox/xmax:', img.features.feature['image/object/bbox/xmax'].float_list.value)
+            print('image/object/bbox/ymin:', img.features.feature['image/object/bbox/ymin'].float_list.value)
+            print('image/object/bbox/ymax:', img.features.feature['image/object/bbox/ymax'].float_list.value)
+            print('image/object/class/text:', [text.decode('utf-8') for text in img.features.feature['image/object/class/text'].bytes_list.value])
+            print('image/object/class/label:', img.features.feature['image/object/class/label'].int64_list.value)
+            print('image/object/instance/id:', img.features.feature['image/object/instance/id'].int64_list.value)
             
-    #         print('\n')
+            print('\n')

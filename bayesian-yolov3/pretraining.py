@@ -33,16 +33,16 @@ def main():
         'implicit_background_class': True,  # whether the label ids start at 1 or 0. True = 1, False = 0
         'train': {
             # 'file_pattern': os.getcwd() + '/data/ecp/tfrecords/ecp-day-¨-*-of-*',  # edit
-            'file_pattern': 'data/ecp/tfrecords/ecp-train-*-of-*',  # edit
-            # 'file_pattern': 'DATA/tfrecords_20_4/ecp-train-*-of-*',  # edit
+            # 'file_pattern': 'data/ecp/tfrecords/ecp-train-*-of-*',  # edit
+            'file_pattern': 'DATA/tfrecords_20_4/ecp-train-*-of-*',  # edit
             'num_shards': 100,
             'shuffle_buffer_size': 2000,
             'cache': False,  # edit if you have enough memory, caches whole dataset in memory
         },
         'val': {
             # 'file_pattern': os.getcwd() + '/data/ecp/tfrecords/ecp-day-val-*-of-*',  # edit
-            'file_pattern': 'data/ecp/tfrecords/ecp-val-*-of-*',  # edit
-            # 'file_pattern': 'DATA/tfrecords_20_4/ecp-val-*-of-*',  # edit
+            # 'file_pattern': 'data/ecp/tfrecords/ecp-val-*-of-*',  # edit
+            'file_pattern': 'DATA/tfrecords_20_4/ecp-val-*-of-*',  # edit
             'num_shards': 8,
             'shuffle_buffer_size': 10,
             'cache': False,  # edit if you have enough memory, caches whole dataset in memory
