@@ -11,8 +11,6 @@ import tqdm
 
 from lib_yolo import dataset_utils, data_augmentation
 
-tf.keras.backend.set_image_data_format('channels_last')
-
 def save_config(config, folder):
     time_string = datetime.datetime.now().isoformat().split('.')[0]
     file = os.path.join(folder, 'config_{}_{}.json'.format(time_string, config['run_id']))
@@ -27,22 +25,22 @@ def save_config(config, folder):
 
 
 def start(model_cls, config):
-
+    # Set global format
+    tf.keras.backend.set_image_data_format('channels_last')
     if config['crop']:
         cropper = data_augmentation.ImageCropper(config)
         config['train']['crop_fn'] = cropper.random_crop_and_sometimes_rescale
         config['val']['crop_fn'] = cropper.random_crop_and_sometimes_rescale
-
     model_factory = model_cls(config)
-
-    dataset = dataset_utils.TrainValDataset(model_blueprint=model_factory.blueprint, config=config)        
-    # print("BUILT WITH CUDA: ", tf.test.is_built_with_cuda())
-    
-    # currently all models have 3 detection layers, so this works...
+    dataset = dataset_utils.TrainValDataset(model_blueprint=model_factory.blueprint, config=config)
     img, gt1, gt2, gt3 = dataset.iterator.get_next()
-    # print('IMG SHAPE:', img.shape)
-    
-    model = model_factory.init_model(inputs=img, training=True, gt1=gt1, gt2=gt2, gt3=gt3).get_model()
+    model = model_factory.init_model(
+        inputs=img, 
+        training=True, 
+        gt1=gt1, 
+        gt2=gt2, 
+        gt3=gt3
+    ).get_model()
 
     # also all models are powerd by darknet53...
     assign_ops = model_factory.load_darknet53_weights(config['darknet53_weights'])
@@ -61,6 +59,7 @@ def start(model_cls, config):
     conf.allow_soft_placement = True
     
     with tf.Session(config=conf) as sess:
+        
         dataset.init_dataset(sess)
 
         try:
